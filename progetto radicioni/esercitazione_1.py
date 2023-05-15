@@ -7,8 +7,8 @@ from scipy import stats
 
 
 def sim_lc(word1, word2):
-    syns1 = getsynSet(word1)
-    syns2 = getsynSet(word2)
+    syns1 = get_synset(word1)
+    syns2 = get_synset(word2)
 
     sim = []
 
@@ -29,8 +29,8 @@ def sim_lc(word1, word2):
 
 
 def sim_path(word1, word2):
-    syns1 = getsynSet(word1)
-    syns2 = getsynSet(word2)
+    syns1 = get_synset(word1)
+    syns2 = get_synset(word2)
 
     sim = []
     for s1 in syns1:
@@ -65,29 +65,29 @@ def sim_path(word1, word2):
 
 def wu_palmer(word1, word2):
     cs = []
-    syns1 = getsynSet(word1)
-    syns2 = getsynSet(word2)
+    syns1 = get_synset(word1)
+    syns2 = get_synset(word2)
     # print("syn1: ", syns1, "syn2: ", syns2)
     for i in range(len(syns1)):
         for j in range(len(syns2)):
-            depths1 = getDepth(syns1[i])
-            depths2 = getDepth(syns2[j])
+            depths1 = get_depth(syns1[i])
+            depths2 = get_depth(syns2[j])
             # print(syns1[i], syns2[j])
-            LCS = getLCS(syns1[i], syns2[j])
+            LCS = get_lcs(syns1[i], syns2[j])
             # print(LCS)
-            depthLCS = getDepth(LCS)
+            depth_lcs = get_depth(LCS)
             # cs.append(2 * depthLCS / (depths1 + depths2))
 
             # inizio mod
-            cs.append((2 * depthLCS) / (depths1 + depths2))
+            cs.append((2 * depth_lcs) / (depths1 + depths2))
     return get_max(cs)
 
 
-def getsynSet(word):
+def get_synset(word):
     return wn.synsets(word)
 
 
-def getDepth(syns):
+def get_depth(syns):
     root = wn.synset('entity.n.01')
     # print("cerco depth di: ", syns, root)
     if isinstance(syns, list):
@@ -96,7 +96,7 @@ def getDepth(syns):
     return syns.path_similarity(root)
 
 
-def getLCS(synset1, synset2):
+def get_lcs(synset1, synset2):
     if synset1 and synset2:
         lca_synset = synset1.lowest_common_hypernyms(synset2)
         if len(lca_synset) == 0:
@@ -105,26 +105,26 @@ def getLCS(synset1, synset2):
     return lca_synset
 
 
-def read_wordSense353():
+def read_word_sense353():
 
     df = pd.read_csv('WordSim353.csv', sep=',', header=None,
                      names=['Word1', 'Word2', 'similarity'])
     # crea una matrice con le colonne col1, col2 e col3
-    tableWords = df[['Word1', 'Word2', 'similarity']].values
+    table_words = df[['Word1', 'Word2', 'similarity']].values
 
-    return tableWords
+    return table_words
 
 
 def get_max(l):
-    max = 0.0
+    m = 0.0
     for c in l:
         # print("c:", c)
-        if c > max:
-            max = c
-    return max
+        if c > m:
+            m = c
+    return m
 
 
-def cc_Pearson(x, y):
+def cc_pearson(x, y):
     return (covariance(x, y)[0][1] / (st_dev(x) * st_dev(y)))
 
 
@@ -137,7 +137,7 @@ def st_dev(v):
 
 
 if __name__ == '__main__':
-    wordSense = read_wordSense353()
+    wordSense = read_word_sense353()
     max_results = []
     for_dev_std_test = []
     results = pd.DataFrame(
@@ -151,15 +151,8 @@ if __name__ == '__main__':
     for_sim_path_std = []
     for_sim_lc_std = []
 
-    # print(std_wu_pa, std_test)
-    # print(max_wu_pa_results)
-    # print(np.cov([4.5, 3.4]))
-
     for po in max_results:
-        # print(np.std([po[0][1]]))
-        # print(po[0][1], po[1])
         new_r = [po[0], po[1], po[2], po[3], po[4], po[5]]
-        # print(new_r)
         results.loc[len(results.index)] = new_r
         for_wu_pa_std.append(po[3])
         for_sim_path_std.append(po[4])
@@ -167,30 +160,16 @@ if __name__ == '__main__':
     print(results)
 
     print("Pearson Correlation Coefficent for Wu_Palmer: ",
-          cc_Pearson(for_dev_std_test, for_wu_pa_std))
-    # rank di default eseguito in base alla media
-    print("Spearman's Rank Correlation Coefficent for Wu_Palmer: ", cc_Pearson(
+          cc_pearson(for_dev_std_test, for_wu_pa_std))
+    print("Spearman's Rank Correlation Coefficent for Wu_Palmer: ", cc_pearson(
         stats.rankdata(for_dev_std_test), stats.rankdata(for_wu_pa_std)))
 
     print("Pearson Correlation Coefficent for Sim_Path: ",
-          cc_Pearson(for_dev_std_test, for_sim_path_std))
-    # rank di default eseguito in base alla media
-    print("Spearman's Rank Correlation Coefficent for Sim_Path: ", cc_Pearson(
+          cc_pearson(for_dev_std_test, for_sim_path_std))
+    print("Spearman's Rank Correlation Coefficent for Sim_Path: ", cc_pearson(
         stats.rankdata(for_dev_std_test), stats.rankdata(for_sim_path_std)))
-    
+
     print("Pearson Correlation Coefficent for Sim_LC: ",
-          cc_Pearson(for_dev_std_test, for_sim_lc_std))
-    # rank di default eseguito in base alla media
-    print("Spearman's Rank Correlation Coefficent for Sim_LC: ", cc_Pearson(
+          cc_pearson(for_dev_std_test, for_sim_lc_std))
+    print("Spearman's Rank Correlation Coefficent for Sim_LC: ", cc_pearson(
         stats.rankdata(for_dev_std_test), stats.rankdata(for_sim_lc_std)))
-
-    # cs = provaWUePALMER(wordSense[0][0], wordSense[0][1])
-    # max = get_max(cs)
-    # print(max)
-    # shoretest_path = simPath(wordSense[0][0], wordSense[0][1])
-
-    # print(cs, wordSense[0][2],'\n')
-    # print(shoretest_path)
-    # for i in range(len(wordSense)):
-    # print(cs[i], wordSense[i][3])
-#
