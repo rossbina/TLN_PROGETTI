@@ -48,7 +48,7 @@ def wu_palmer(word1, word2):
         for j in range(len(syns2)):
             depths1 = getDepth(syns1[i])
             depths2 = getDepth(syns2[j])
-            #print(syns1[i], syns2[j])
+            # print(syns1[i], syns2[j])
             LCS = getLCS(syns1[i], syns2[j])
             # print(LCS)
             depthLCS = getDepth(LCS)
@@ -65,9 +65,9 @@ def getsynSet(word):
 
 def getDepth(syns):
     root = wn.synset('entity.n.01')
-    #print("cerco depth di: ", syns, root)
+    # print("cerco depth di: ", syns, root)
     if isinstance(syns, list):
-        #print(syns)
+        # print(syns)
         syns = syns[0]
     return syns.path_similarity(root)
 
@@ -100,12 +100,12 @@ def get_max(l):
     return max
 
 
-def cc_Pearson(x, y):
-    return covariance(x, y) / (st_dev(x) * st_dev(y))
+def cc_Pearson(x, y, x_dev, y_dev):
+    return covariance(x, y) / (x_dev * y_dev)
 
 
 def covariance(x, y):
-    return np.cov(x, y)
+    return np.cov([x, y])
 
 
 def st_dev(v):
@@ -116,12 +116,34 @@ if __name__ == '__main__':
     wordSense = read_wordSense353()
     # print(wordSense)
     max_wu_pa_results = []
+    for_dev_std_test = []
+    results = pd.DataFrame(
+        columns=["word1", "word2", "test_value", "wu_palmer_value", "pearson_cc"])
     for i in range(len(wordSense)):
-        max_wu_pa_results.append(wu_palmer(
-            wordSense[i][0], wordSense[i][1]))
-    #print(max_wu_pa_results)
+        max_wu_pa_results.append((wu_palmer(
+            wordSense[i][0], wordSense[i][1]), wordSense[i][2]))
+        for_dev_std_test.append(wordSense[i][2])
+
+    std_test = st_dev(for_dev_std_test)
+    for_wu_pa_std = []
+
+    for p in max_wu_pa_results:
+        for_wu_pa_std.append(p[0][1])
+
+    std_wu_pa = st_dev(for_wu_pa_std)
+
+    # print(std_wu_pa, std_test)
+    # print(max_wu_pa_results)
+    # print(np.cov([4.5, 3.4]))
+
     for po in max_wu_pa_results:
-        print(po)
+        # print(np.std([po[0][1]]))
+        # print(po[0][1], po[1])
+        new_r = [po[0][0][0], po[0][0][1], po[1], po[0][1],
+                 cc_Pearson(po[1], po[0][1], std_test, std_wu_pa)]
+        # print(new_r)
+        results.loc[len(results.index)] = new_r
+    print(results)
 
     # cs = provaWUePALMER(wordSense[0][0], wordSense[0][1])
     # max = get_max(cs)
