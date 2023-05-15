@@ -138,7 +138,6 @@ def st_dev(v):
 
 if __name__ == '__main__':
     wordSense = read_wordSense353()
-    # print(wordSense)
     max_results = []
     for_dev_std_test = []
     results = pd.DataFrame(
