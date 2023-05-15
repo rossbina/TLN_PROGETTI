@@ -1,15 +1,17 @@
-import random
 
-import nltk
 from nltk.corpus import semcor
 from nltk.corpus import wordnet as wn
+import random
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.wsd import lesk
 
 def leak_Algorithm(word,sentence):
-    #syns_word = wn.synset(word)
-   # syns_word.lemmas("eng")
     print(word)
+    syns_word = wn.synsets(word)
+
+    #syns_word.lemmas("eng")
+    #print(syns_word)
    #ciao = syns_word.lemma_names()
    # print(ciao)
     max_overlap = 0
