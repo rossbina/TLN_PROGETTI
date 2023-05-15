@@ -32,7 +32,7 @@ def simPath(word1, word2):
                 # Calcola la similarità del percorso utilizzando la formula: simpath(s1, s2) = 1 - (len(s1, s2) / (2 * depth_max))
                 sim.append(2 * depth_max - path_len)
 
-    return sim
+    return get_max(sim)
 
 # Definizione della funzione di similarità
 
@@ -117,28 +117,30 @@ def st_dev(v):
 if __name__ == '__main__':
     wordSense = read_wordSense353()
     # print(wordSense)
-    max_wu_pa_results = []
+    max_results = []
     for_dev_std_test = []
     results = pd.DataFrame(
-        columns=["word1", "word2", "test_value", "wu_palmer_value"])
+        columns=["word1", "word2", "test_value", "wu_palmer_value", "sim_path_value"])
     for i in range(len(wordSense)):
-        max_wu_pa_results.append((wordSense[i][0],  wordSense[i][1], wordSense[i][2], wu_palmer(
-            wordSense[i][0], wordSense[i][1])))
+        max_results.append((wordSense[i][0],  wordSense[i][1], wordSense[i][2], wu_palmer(
+            wordSense[i][0], wordSense[i][1]), simPath(wordSense[i][0], wordSense[i][1])))
         for_dev_std_test.append(wordSense[i][2])
 
     for_wu_pa_std = []
+    for_sim_path_std = []
 
     # print(std_wu_pa, std_test)
     # print(max_wu_pa_results)
     # print(np.cov([4.5, 3.4]))
 
-    for po in max_wu_pa_results:
+    for po in max_results:
         # print(np.std([po[0][1]]))
         # print(po[0][1], po[1])
-        new_r = [po[0], po[1], po[2], po[3]]
+        new_r = [po[0], po[1], po[2], po[3], po[4]]
         # print(new_r)
         results.loc[len(results.index)] = new_r
         for_wu_pa_std.append(po[3])
+        for_sim_path_std.append(po[4])
     print(results)
 
     print("Pearson Correlation Coefficent for Wu_Palmer: ",
@@ -146,6 +148,12 @@ if __name__ == '__main__':
     # rank di default eseguito in base alla media
     print("Spearman's Rank Correlation Coefficent for Wu_Palmer: ", cc_Pearson(
         stats.rankdata(for_dev_std_test), stats.rankdata(for_wu_pa_std)))
+    
+    print("Pearson Correlation Coefficent for Sim_Path: ",
+          cc_Pearson(for_dev_std_test, for_sim_path_std))
+    # rank di default eseguito in base alla media
+    print("Spearman's Rank Correlation Coefficent for Sim_Path: ", cc_Pearson(
+        stats.rankdata(for_dev_std_test), stats.rankdata(for_sim_path_std)))
 
     # cs = provaWUePALMER(wordSense[0][0], wordSense[0][1])
     # max = get_max(cs)
