@@ -3,6 +3,8 @@ from nltk.corpus import wordnet as wn
 import pandas as pd
 import numpy as np
 
+from scipy import stats
+
 
 def simPath(word1, word2):
     syns1 = getsynSet(word1)
@@ -55,7 +57,7 @@ def wu_palmer(word1, word2):
             # cs.append(2 * depthLCS / (depths1 + depths2))
 
             # inizio mod
-            cs.append([(word1, word2), (2 * depthLCS) / (depths1 + depths2)])
+            cs.append((2 * depthLCS) / (depths1 + depths2))
     return get_max(cs)
 
 
@@ -92,10 +94,10 @@ def read_wordSense353():
 
 
 def get_max(l):
-    max = [("", ""), 0.0]
+    max = 0.0
     for c in l:
         # print("c:", c)
-        if c[1] > max[1]:
+        if c > max:
             max = c
     return max
 
@@ -120,8 +122,8 @@ if __name__ == '__main__':
     results = pd.DataFrame(
         columns=["word1", "word2", "test_value", "wu_palmer_value"])
     for i in range(len(wordSense)):
-        max_wu_pa_results.append((wu_palmer(
-            wordSense[i][0], wordSense[i][1]), wordSense[i][2]))
+        max_wu_pa_results.append((wordSense[i][0],  wordSense[i][1], wordSense[i][2], wu_palmer(
+            wordSense[i][0], wordSense[i][1])))
         for_dev_std_test.append(wordSense[i][2])
 
     for_wu_pa_std = []
@@ -133,13 +135,17 @@ if __name__ == '__main__':
     for po in max_wu_pa_results:
         # print(np.std([po[0][1]]))
         # print(po[0][1], po[1])
-        new_r = [po[0][0][0], po[0][0][1], po[1], po[0][1]]
+        new_r = [po[0], po[1], po[2], po[3]]
         # print(new_r)
         results.loc[len(results.index)] = new_r
-        for_wu_pa_std.append(po[0][1])
+        for_wu_pa_std.append(po[3])
     print(results)
 
-    print("Pearson Correlation Coefficent: ", cc_Pearson(for_dev_std_test, for_wu_pa_std))
+    print("Pearson Correlation Coefficent for Wu_Palmer: ",
+          cc_Pearson(for_dev_std_test, for_wu_pa_std))
+    # rank di default eseguito in base alla media
+    print("Spearman's Rank Correlation Coefficent for Wu_Palmer: ", cc_Pearson(
+        stats.rankdata(for_dev_std_test), stats.rankdata(for_wu_pa_std)))
 
     # cs = provaWUePALMER(wordSense[0][0], wordSense[0][1])
     # max = get_max(cs)
