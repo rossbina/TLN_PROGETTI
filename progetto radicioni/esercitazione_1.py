@@ -5,6 +5,24 @@ import numpy as np
 
 from scipy import stats
 
+def simLC(word1, word2):
+    syns1 = getsynSet(word1)
+    syns2 = getsynSet(word2)
+
+    sim = []
+
+    for s1 in syns1:
+        for s2 in syns2:
+            if isinstance(s1, list):
+                s1 = s1[0]
+            if isinstance(s2, list):
+                s2 = s2[0]
+            depth_max = max(s1.max_depth(), s2.max_depth())
+            # print(depth_max)
+            path_len = s1.shortest_path_distance(s2)
+            
+
+    return get_max(sim)
 
 def simPath(word1, word2):
     syns1 = getsynSet(word1)
