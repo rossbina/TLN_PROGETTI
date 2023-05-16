@@ -1,4 +1,6 @@
 
+from nltk.wsd import lesk
+from nltk.tokenize import word_tokenize
 from nltk.corpus import semcor
 from nltk.corpus import wordnet as wn
 from nltk.corpus import stopwords as sw
@@ -7,8 +9,6 @@ import nltk
 # nltk.download('semcor')
 # nltk.download('punct')
 # nltk.download('stopwords')
-from nltk.tokenize import word_tokenize
-from nltk.wsd import lesk
 
 
 def remove_punctuation(tokenized_sentence):
@@ -87,6 +87,5 @@ if __name__ == '__main__':
         for w in s:
             # i = random.randint(0, len(clear_sent)-1)
             best_sense = lesk(w, s)
-            if best_sense is not None:
-                if ".n." in best_sense.name():
-                    print(w, "->", best_sense, "|", best_sense.definition())
+            if best_sense is not None and ".n." in best_sense.name():
+                print(w, "->", best_sense, "|", best_sense.definition())
