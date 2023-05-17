@@ -60,7 +60,7 @@ def lesk(word, sentence):
         return None
 
     context = remove_punctuation(sentence)
-    context = remove_stop_words(context)
+    #context = remove_stop_words(context)
     max_overlap = 0
 
     best_sense = syns_word[0]

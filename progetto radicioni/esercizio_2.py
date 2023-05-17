@@ -127,15 +127,20 @@ if __name__ == '__main__':
     synset_borra = []
     synset_gino= []
     i = 0
+    j = 0
     for f in frames_set_Borra:
         synset_borra.append(wn.synsets(get_main_term(f)))
     for f in frames_set_Gino:
         synset_gino.append(wn.synsets(get_main_term(f)))
-    for s in synset_borra:
+    for f in frames_set_Gino:
 
+        for i in range(len(synset_gino)):
 
+            print("FRAME NAME : ", frames_set_Gino[i],"\nTRA I SENSI : ",synset_gino[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_gino[i]))
 
-        print("FRAME NAME : ", frames_set_Borra[i], "\n","TRA I SENSI : ",synset_borra,' \n SYNSET MAPPATO -->' , disambiguate_term(s))
+    for f in frames_set_Borra:
+        for i in range(len(synset_borra)):
+            print("FRAME NAME : ", frames_set_Borra[i],"\nTRA I SENSI : ",synset_borra[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_borra[i]))
 
 
 
