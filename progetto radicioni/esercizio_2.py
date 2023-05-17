@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
 
 
-        print("FRAME NAME : ", frames_set_Borra[i], "\n","TRA I SENSI : ",synset_borra,' \nSYNSET MAPPATO -->' , disambiguate_term(s))
+        print("FRAME NAME : ", frames_set_Borra[i], "\n","TRA I SENSI : ",synset_borra,' \n SYNSET MAPPATO -->' , disambiguate_term(s))
 
 
 
