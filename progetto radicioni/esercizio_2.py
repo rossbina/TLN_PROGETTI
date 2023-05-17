@@ -8,11 +8,15 @@ from random import seed
 from nltk import WordNetLemmatizer
 from nltk.corpus import wordnet as wn
 from nltk.corpus import framenet as fn
+from nltk.tokenize import word_tokenize
+
+from esercitazione1_1 import remove_punctuation
 
 
 def print_frames_with_IDs():
     for x in fn.frames():
         print('{}\t{}'.format(x.ID, x.name))
+
 
 def get_frams_IDs():
     return [f.ID for f in fn.frames()]
@@ -20,19 +24,21 @@ def get_frams_IDs():
 
 def getFrameSetForStudent(surname, list_len=5):
     nof_frames = len(fn.frames())
-    base_idx = (abs(int(hashlib.sha512(surname.encode('utf-8')).hexdigest(), 16)) % nof_frames)
-    frames_set=[]
+    base_idx = (
+        abs(int(hashlib.sha512(surname.encode('utf-8')).hexdigest(), 16)) % nof_frames)
+    frames_set = []
     print('\nstudent: ' + surname)
     framenet_IDs = get_frams_IDs()
     i = 0
     offset = 0
     seed(1)
     while i < list_len:
-        fID = framenet_IDs[(base_idx+offset)%nof_frames]
+        fID = framenet_IDs[(base_idx+offset) % nof_frames]
         f = fn.frame(fID)
         fNAME = f.name
-        print('\tID: {a:4d}\tframe: {framename}'.format(a=fID, framename=fNAME))
-        frames_set.append(f.name)
+        print('\tID: {a:4d}\tframe: {framename}'.format(
+            a=fID, framename=fNAME))
+        frames_set.append(f)
         offset = randint(0, nof_frames)
         i += 1
     return frames_set
@@ -54,31 +60,17 @@ def get_main_term(mwe):
 
     return main_term
 
-from nltk.corpus import wordnet as wn
 
-def get_context(synsets):
-    #print("getcontext()")
-    context = []
+def ctx_sense(sense):
+    gloss = remove_punctuation(word_tokenize(sense.definition()))
+    examples = sense.examples()
 
-    # Aggiungi definizioni dei synset contenenti il termine
-    for s in synsets:
-        #print("synsets",": ", s)
-        definitions = s.definition()
-        #print("definizioni trovate:",definitions)
-        context.append(definitions)
-        #print("contesto :",context)
+    scomposed_exemples = []
 
-    # Aggiungi esempi dei synset contenenti il termine
-    for synset in synsets:
-        examples = synset.examples()
-        #print("examples :", examples)
-        #print("context afted exapmples: ",context)
-        for example in examples:
-            if example != []:
-                context.append(example)
+    for e in examples:
+        scomposed_exemples += remove_punctuation(word_tokenize(e))
 
-    # Restituisci il contesto come una lista di frasi
-    return context
+    return (gloss + scomposed_exemples)
 
 
 def calculate_score(synset, context):
@@ -91,12 +83,12 @@ def calculate_score(synset, context):
         if isinstance(sentence, list):
             sentence = sentence[0]
 
-        words= sentence.split(" ")
+        words = sentence.split(" ")
         for word in words:
             word_synsets = wn.synsets(word)
             for word_synset in word_synsets:
                 if word_synset == synset:
-                 score += 1
+                    score += 1
     return score
 
 
@@ -105,13 +97,15 @@ def disambiguate_term(synsets):
     if len(synsets) == 1:
         return synsets[0]
     elif len(synsets) > 1:
-        context = get_context(synsets)  # Implementa la logica per ottenere il contesto del termine
+        # Implementa la logica per ottenere il contesto del termine
+        context = get_context(synsets)
         #print("context : ",context)
         best_score = 0
         selected_synset = None
 
         for synset in synsets:
-            score = calculate_score(synset, context)  # Implementa la logica per calcolare lo score di ogni synset
+            # Implementa la logica per calcolare lo score di ogni synset
+            score = calculate_score(synset, context)
 
             if score > best_score:
                 best_score = score
@@ -121,31 +115,78 @@ def disambiguate_term(synsets):
 
     return None
 
+# w = FName
+
+
+def ctx(w):
+    return remove_punctuation(word_tokenize(w.definition))
+
+
+def score(sig, cont):
+
+    sig_set = set(sig)
+    cont_set = set(cont)
+
+    return (len(sig_set.intersection(cont_set))+1)
+
+
 if __name__ == '__main__':
     frames_set_Borra = getFrameSetForStudent('Borra')
     frames_set_Gino = getFrameSetForStudent('Gino')
-    synset_borra = []
-    synset_gino= []
+
+    synset_borra = {}
+    fe_borra = []
+    lu_borra = []
+
+    synset_gino = []
+    fe_gino = []
+    lu_gino = []
+
+    cw_borra = []
+    cs_borra = []
+
     i = 0
     j = 0
-    for f in frames_set_Borra:
-        synset_borra.append(wn.synsets(get_main_term(f)))
-    for f in frames_set_Gino:
-        synset_gino.append(wn.synsets(get_main_term(f)))
-    for f in frames_set_Gino:
-
-        for i in range(len(synset_gino)):
-
-            print("FRAME NAME : ", frames_set_Gino[i],"\nTRA I SENSI : ",synset_gino[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_gino[i]))
 
     for f in frames_set_Borra:
-        for i in range(len(synset_borra)):
-            print("FRAME NAME : ", frames_set_Borra[i],"\nTRA I SENSI : ",synset_borra[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_borra[i]))
+        synset_borra[f.name] = (wn.synsets(get_main_term(f.name)))
+        fe_borra.append(f.FE)
+        lu_borra.append(f.lexUnit)
 
+        cw_borra = ctx(f)
 
+        best_sense = None
+        best_score = 0
 
+        for s in synset_borra[f.name]:
+            cs_borra = ctx_sense(s)
+            temp_score = score(cs_borra, cw_borra)
 
+            if temp_score > best_score:
+                best_score = temp_score
+                best_sense = s
 
+        # print(set(cs_borra))
+        # print(set(cw_borra))
 
+        print("FRAME NAME : ", f.name, "\nTRA I SENSI : ",
+              synset_borra[f.name], ' \nSYNSET MAPPATO -->', best_sense, 'con Score: ', best_score)
 
+    #cs_borra = ctx(s)
 
+    # for f in frames_set_Gino:
+    #   synset_gino.append(wn.synsets(get_main_term(f.name)))
+    #  fe_gino.append(f.FE)
+    # lu_gino.append(f.lexUnit)
+
+    # for f in frames_set_Gino:
+    # synset_gino.append(wn.synsets(get_main_term(f.name)))
+    # for f in frames_set_Gino:
+
+    # for i in range(len(synset_gino)):
+
+    #print("FRAME NAME : ", frames_set_Gino[i],"\nTRA I SENSI : ",synset_gino[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_gino[i]))
+
+    # for f in frames_set_Borra:
+    # for i in range(len(synset_borra)):
+    #print("FRAME NAME : ", frames_set_Borra[i],"\nTRA I SENSI : ",synset_borra[i],' \nSYNSET MAPPATO -->' , disambiguate_term(synset_borra[i]))
