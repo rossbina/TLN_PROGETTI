@@ -129,7 +129,6 @@ def score(sig, cont):
 
     return (len(sig_set.intersection(cont_set))+1)
 
-
 if __name__ == '__main__':
     frames_set_Borra = getFrameSetForStudent('Borra')
     frames_set_Gino = getFrameSetForStudent('Gino')
@@ -176,6 +175,7 @@ if __name__ == '__main__':
         print("FE OF", f.name)
         i = 0
         for fe in fe_borra:
+
             for f1 in fe:
                 i=i+1
                 print(" n°: ",i ," ---> ",f1)
@@ -183,13 +183,15 @@ if __name__ == '__main__':
                 frameset_borra_FE[f1]= fe[f1]
                 best_sense_FE = None
                 best_score_FE = 0
+                temp_score_FE = 0
+
 
                 for frame in frameset_borra_FE[f1]:
                     cw_borra_FE = ctx(frameset_borra_FE[f1])
                     for s in synset_borra_FE[f1]:
                         temp_score_FE = score(ctx_sense(s), cw_borra_FE)
                         if temp_score_FE > best_score_FE:
-                            best_score_FE = temp_score
+                            best_score_FE = temp_score_FE
                             best_sense_FE = s
 
                 print(" **Mapping**: \n", f1, " *Best Sense*: ", best_sense_FE, "\n *Score*: ", best_score_FE,"\n")
