@@ -134,7 +134,10 @@ if __name__ == '__main__':
     frames_set_Borra = getFrameSetForStudent('Borra')
     frames_set_Gino = getFrameSetForStudent('Gino')
 
-    synset_borra = {}
+    synset_borra_fname = {}
+    synset_borra_FE = {}
+    frameset_borra_FE = {}
+    synset_borra_LU = {}
     fe_borra = []
     lu_borra = []
 
@@ -143,13 +146,15 @@ if __name__ == '__main__':
     lu_gino = []
 
     cw_borra = []
+    cw_borra_FE= []
     cs_borra = []
 
     i = 0
     j = 0
 
     for f in frames_set_Borra:
-        synset_borra[f.name] = (wn.synsets(get_main_term(f.name)))
+        fe_borra = []
+        synset_borra_fname[f.name] = (wn.synsets(get_main_term(f.name)))
         fe_borra.append(f.FE)
         lu_borra.append(f.lexUnit)
 
@@ -158,19 +163,44 @@ if __name__ == '__main__':
         best_sense = None
         best_score = 0
 
-        for s in synset_borra[f.name]:
+        for s in synset_borra_fname[f.name]:
             cs_borra = ctx_sense(s)
             temp_score = score(cs_borra, cw_borra)
 
             if temp_score > best_score:
                 best_score = temp_score
                 best_sense = s
+        print("-----------------------------------------------------")
+        print("FRAME NAME : ", f.name,' \n**Mapping**:\n *Sense*: ', best_sense, '\n *Score* : ', best_score)
+        print("-----------------------------------------------------")
+        print("FE OF", f.name)
+        i = 0
+        for fe in fe_borra:
+            for f1 in fe:
+                i=i+1
+                print(" n°: ",i ," ---> ",f1)
+                synset_borra_FE[f1] = (wn.synsets(get_main_term(f1)))
+                frameset_borra_FE[f1]= fe[f1]
+                best_sense_FE = None
+                best_score_FE = 0
+
+                for frame in frameset_borra_FE[f1]:
+                    cw_borra_FE = ctx(frameset_borra_FE[f1])
+                    for s in synset_borra_FE[f1]:
+                        temp_score_FE = score(ctx_sense(s), cw_borra_FE)
+                        if temp_score_FE > best_score_FE:
+                            best_score_FE = temp_score
+                            best_sense_FE = s
+
+                print(" **Mapping**: \n", f1, " *Best Sense*: ", best_sense_FE, "\n *Score*: ", best_score_FE,"\n")
+        print("-----------------------------------------------------")
+        print("-----------------------------------------------------")
 
         # print(set(cs_borra))
         # print(set(cw_borra))
 
-        print("FRAME NAME : ", f.name, "\nTRA I SENSI : ",
-              synset_borra[f.name], ' \nSYNSET MAPPATO -->', best_sense, 'con Score: ', best_score)
+        #print("FRAME NAME : ", f.name, "\nTRA I SENSI : ",
+              #synset_borra_fname[f.name], ' \nSYNSET MAPPATO -->', best_sense, 'con Score: ', best_score)
 
     #cs_borra = ctx(s)
 
