@@ -1,0 +1,30 @@
+S -> NP VP
+S -> X1 VP
+X1 -> Aux NP
+X1 -> Adj NP
+S -> book | prefer
+S -> Verb NP
+S -> X2 PP
+S -> VP PP
+NP -> I | she | me | TWA | Houston
+NP -> Det Nominal
+NP -> X3 Nominal
+X3 -> Det Adj
+Nominal -> book | flight
+Nominal -> Nominal Noun
+Nominal -> Nominal PP
+Preposition -> through | bau
+Aux -> does | miao
+VP -> book | prefer
+VP -> Verb NP
+VP -> X2 VP
+X2 -> Verb NP
+VP -> Verb PP
+VP -> VP NP
+PP -> Preposition NP
+Det -> a | the
+Noun -> book | flight | morning
+Verb -> book | prefer 
+Pronoun -> she
+Proper-Noun -> Houston
+Adj -> morning | ciao

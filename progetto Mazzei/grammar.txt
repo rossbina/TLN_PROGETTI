@@ -1,0 +1,20 @@
+S -> NN PVS
+S -> Noun PVS
+S -> Noun PrS
+S -> Noun Pronoun
+S -> Prefix VS
+PrS -> Pronoun Suffix
+PVS -> Prefix PVS
+PVS -> Verb Pronoun
+PVS -> PV Suffix
+NN -> NN PVS
+NN -> Noun Noun
+PV -> Prefix Verb
+VS -> Verb Suffix
+Prefix -> Prefix Verb
+Verb -> Verb Suffix
+Noun -> tlhIngan | Hol | puq | pa'Daq
+Suffix -> 'a' | taH | be'
+Prefix -> vI | Da | jI | bI
+Pronoun -> jIH | maH
+Verb -> jatlh | legh | yaj
